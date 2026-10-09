@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f3ee">
+  <title>Nathan Li — Personal Timeline</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page: light-dark(#f5f3ee, #171918);
+      --surface: light-dark(#ffffff, #222624);
+      --surface-soft: light-dark(#eeece5, #2a302d);
+      --ink: light-dark(#202923, #f2f3ee);
+      --muted: light-dark(#6e766f, #aeb8b0);
+      --line: light-dark(#dcded5, #414943);
+      --accent: light-dark(#2f6b55, #91d2b0);
+      --accent-ink: light-dark(#ffffff, #17251d);
+      --highlight: light-dark(#e1eee5, #293e32);
+      --shadow: 0 16px 40px rgba(22, 32, 25, .07);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button { font: inherit; }
+    .app { min-height: 100vh; width: 100%; background: var(--page); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 24px clamp(20px, 5vw, 68px); border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 750; letter-spacing: -.03em; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-size: 14px; }
+    .top-note { color: var(--muted); font-size: 13px; }
+    .hero { padding: clamp(38px, 7vw, 84px) clamp(20px, 5vw, 68px) 42px; max-width: 1500px; margin: 0 auto; }
+    .eyebrow { text-transform: uppercase; font-size: 11px; letter-spacing: .17em; font-weight: 800; color: var(--accent); }
+    h1 { margin: 12px 0 14px; font-size: clamp(42px, 7.5vw, 88px); line-height: .98; letter-spacing: -.075em; font-weight: 760; }
+    .hero-copy { color: var(--muted); max-width: 620px; font-size: clamp(15px, 1.6vw, 18px); line-height: 1.7; margin: 0; }
+    .quick-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 27px; }
+    .stat { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 9px 14px; color: var(--muted); font-size: 12px; }
+    .stat strong { color: var(--ink); margin-right: 5px; }
+    .workspace { max-width: 1500px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 68px) 72px; display: grid; grid-template-columns: minmax(220px, 290px) minmax(0, 1fr); gap: 28px; align-items: start; }
+    .sidebar { position: sticky; top: 18px; }
+    .section-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 13px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
+    .year-list { display: flex; flex-direction: column; gap: 9px; }
+    .year-button { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 15px 15px; background: var(--surface); color: var(--ink); text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; transition: border-color .18s, background .18s, transform .18s; }
+    .year-button:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .year-button[aria-expanded="true"] { background: var(--highlight); border-color: var(--accent); }
+    .year-left { display: flex; flex-direction: column; gap: 4px; }
+    .year { font-size: 19px; font-weight: 760; letter-spacing: -.04em; }
+    .year-caption { color: var(--muted); font-size: 11px; }
+    .chevron { font-size: 18px; color: var(--accent); transition: transform .18s; }
+    .year-button[aria-expanded="true"] .chevron { transform: rotate(90deg); }
+    .subject-list { display: none; padding: 8px 0 4px 13px; margin: 0 0 3px 12px; border-left: 1px solid var(--line); gap: 6px; }
+    .subject-list.open { display: flex; flex-direction: column; }
+    .subject-button { border: 0; border-radius: 9px; padding: 10px 11px; color: var(--muted); background: transparent; text-align: left; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .subject-button:hover, .subject-button.active { background: var(--surface-soft); color: var(--ink); }
+    .subject-button.active { box-shadow: inset 2px 0 var(--accent); }
+    .subject-count { font-size: 10px; opacity: .7; }
+    .content-panel { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: clamp(22px, 4vw, 40px); box-shadow: var(--shadow); }
+    .content-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+    .content-head h2 { font-size: clamp(25px, 3.4vw, 38px); letter-spacing: -.055em; margin: 8px 0 8px; line-height: 1.1; }
+    .content-head p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .year-chip { flex: 0 0 auto; padding: 8px 12px; border-radius: 999px; background: var(--highlight); color: var(--accent); font-weight: 750; font-size: 12px; }
+    .event-list { padding-top: 25px; display: grid; gap: 15px; }
+    .event-card { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 15px; padding: 17px; border: 1px solid var(--line); border-radius: 15px; background: var(--page); }
+    .event-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--highlight); font-size: 19px; }
+    .event-meta { color: var(--accent); text-transform: uppercase; letter-spacing: .1em; font-weight: 800; font-size: 10px; margin: 2px 0 7px; }
+    .event-card h3 { margin: 0 0 7px; font-size: 16px; letter-spacing: -.025em; }
+    .event-card p { margin: 0; font-size: 13px; line-height: 1.65; color: var(--muted); }
+    .photo-strip { margin-top: 22px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+    .photo { min-height: 150px; border-radius: 15px; overflow: hidden; position: relative; background: var(--surface-soft); }
+    .photo svg { display: block; width: 100%; height: 100%; min-height: 150px; }
+    .photo-label { position: absolute; left: 12px; bottom: 12px; background: rgba(20, 29, 23, .72); color: white; font-size: 10px; padding: 7px 9px; border-radius: 999px; letter-spacing: .04em; }
+    .all-events { max-width: 1500px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 68px) 75px; }
+    .all-events-header { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+    .all-events h2 { font-size: 25px; letter-spacing: -.05em; margin: 7px 0 0; }
+    .all-events-header p { color: var(--muted); font-size: 12px; margin: 0; }
+    .overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+    .overview-card { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); padding: 18px; cursor: pointer; text-align: left; color: var(--ink); transition: transform .18s, border-color .18s; }
+    .overview-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .overview-card .mini-year { color: var(--accent); font-size: 11px; font-weight: 800; }
+    .overview-card h3 { font-size: 15px; margin: 9px 0 7px; }
+    .overview-card p { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 0; }
+    footer { border-top: 1px solid var(--line); padding: 20px clamp(20px, 5vw, 68px); display: flex; justify-content: space-between; gap: 15px; color: var(--muted); font-size: 11px; }
+    .hint { font-size: 11px; color: var(--muted); line-height: 1.6; margin-top: 15px; }
+    @media (max-width: 780px) {
+      .workspace { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .year-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .subject-list { grid-column: 1 / -1; }
+      .overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .top-note { display: none; }
+    }
+    @media (max-width: 480px) {
+      .year-list, .overview-grid { grid-template-columns: 1fr; }
+      .photo-strip { grid-template-columns: 1fr; }
+      .content-head { flex-direction: column; }
+      footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark">NL</div><span>Nathan Li <span style="color:var(--muted);font-weight:500">/ Timeline</span></span></div>
+      <div class="top-note">A personal archive · memories, milestones &amp; moments</div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">Personal archive · 2022—2026</div>
+      <h1>Nathan Li<span style="color:var(--accent)">.</span></h1>
+      <p class="hero-copy">A timeline of the moments, projects, people, and ideas that make up the story so far. Choose a year on the left, then explore a subject to see its key moments.</p>
+      <div class="quick-stats">
+        <div class="stat"><strong id="yearStat">5</strong> years</div>
+        <div class="stat"><strong id="subjectStat">15</strong> subjects</div>
+        <div class="stat"><strong id="eventStat">15</strong> timeline starters</div>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <aside class="sidebar" aria-label="Timeline navigation">
+        <div class="section-label"><span>Explore by year</span><span>↘</span></div>
+        <nav class="year-list" id="yearList"></nav>
+        <p class="hint">Select a year to reveal subjects. Select a subject to open its key moments.</p>
+      </aside>
+
+      <section class="content-panel" aria-live="polite">
+        <div class="content-head">
+          <div>
+            <div class="eyebrow" id="contentEyebrow">START HERE</div>
+            <h2 id="contentTitle">Your story, year by year</h2>
+            <p id="contentDescription">Choose a year and a subject to explore the timeline.</p>
+          </div>
+          <div class="year-chip" id="contentChip">2022—2026</div>
+        </div>
+        <div class="event-list" id="eventList"></div>
+        <div class="photo-strip" id="photoStrip" aria-label="Decorative illustrations">
+          <div class="photo">
+            <svg viewBox="0 0 500 220" role="img" aria-label="Abstract hills at sunrise illustration" preserveAspectRatio="xMidYMid slice">
+              <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5e7df"/><stop offset="1" stop-color="#f4d8b4"/></linearGradient></defs>
+              <rect width="500" height="220" fill="url(#sky)"/><circle cx="365" cy="66" r="29" fill="#fff4ce"/><path d="M0 160 Q90 92 185 151 T370 137 T500 126 V220 H0Z" fill="#8eae9a"/><path d="M0 184 Q130 130 245 177 T500 156 V220 H0Z" fill="#3f715a"/><path d="M0 203 Q150 163 290 198 T500 187 V220 H0Z" fill="#264b3a"/>
+            </svg><span class="photo-label">MOMENTS THAT SHAPE US</span>
+          </div>
+          <div class="photo">
+            <svg viewBox="0 0 360 220" role="img" aria-label="Notebook and stars illustration" preserveAspectRatio="xMidYMid slice">
+              <rect width="360" height="220" fill="#e8e5d9"/><circle cx="288" cy="44" r="19" fill="#d2a96e"/><path d="M0 175 L360 115 V220 H0Z" fill="#c3cbbd"/><g transform="translate(72 28) rotate(-7 95 80)"><rect x="0" y="0" width="185" height="155" rx="9" fill="#fffdf5" stroke="#c6c8bd" stroke-width="2"/><rect x="0" y="0" width="25" height="155" rx="7" fill="#4d7b63"/><g stroke="#d8ded5" stroke-width="2"><path d="M42 35 H160 M42 58 H160 M42 81 H160 M42 104 H145 M42 127 H155"/></g><path d="M45 25 l5 -10 l5 10 l10 5 l-10 5 l-5 10 l-5 -10 l-10 -5Z" fill="#d3a15e"/></g>
+            </svg><span class="photo-label">IDEAS &amp; GROWTH</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="all-events">
+      <div class="all-events-header"><div><div class="eyebrow">The bigger picture</div><h2>Timeline at a glance</h2></div><p>Choose any card to jump into that subject.</p></div>
+      <div class="overview-grid" id="overviewGrid"></div>
+    </section>
+    <footer><span>© Nathan Li · Personal timeline</span><span>Starter template — personalise the events in the HTML file.</span></footer>
+  </div>
+
+  <script>
+    // Replace these example prompts with your own real events, subjects, and dates.
+    // Each year can contain as many subjects and events as you like.
+    const timeline = [
+      { year: "2026", caption: "The year ahead", subjects: [
+        { name: "Goals & plans", icon: "✦", description: "Intentions, plans, and milestones for 2026.", events: [{ date: "Add a date", title: "A goal for this year", text: "Write down an important goal, plan, or milestone you want to remember.", icon: "🎯" }] },
+        { name: "Study & learning", icon: "▤", description: "Learning experiences and new skills.", events: [{ date: "Add a date", title: "Something new to learn", text: "Add a course, subject, skill, or learning moment here.", icon: "📚" }] },
+        { name: "Projects", icon: "◇", description: "Creative work, ideas, and projects in progress.", events: [{ date: "Add a date", title: "A project in progress", text: "Describe a project you started, worked on, or completed.", icon: "🛠️" }] }
+      ]},
+      { year: "2025", caption: "A year of progress", subjects: [
+        { name: "School & study", icon: "▤", description: "Classes, learning, and academic milestones.", events: [{ date: "Add a date", title: "A learning milestone", text: "Add an important assignment, achievement, challenge, or lesson.", icon: "🎓" }] },
+        { name: "Personal projects", icon: "◇", description: "Things you made, built, or explored.", events: [{ date: "Add a date", title: "A project to remember", text: "Record what you worked on, what changed, and what you learned.", icon: "💡" }] },
+        { name: "People & memories", icon: "♡", description: "People and moments that mattered.", events: [{ date: "Add a date", title: "A memorable moment", text: "Add a memory with friends, family, or someone who made a difference.", icon: "📷" }] }
+      ]},
+      { year: "2024", caption: "Discoveries", subjects: [
+        { name: "Highlights", icon: "✦", description: "The standout moments of the year.", events: [{ date: "Add a date", title: "A highlight of 2024", text: "Write about something exciting, meaningful, or memorable from this year.", icon: "✨" }] },
+        { name: "Interests & hobbies", icon: "◉", description: "Things you enjoyed and explored.", events: [{ date: "Add a date", title: "An interest that grew", text: "Add a hobby, sport, creative interest, or new thing you tried.", icon: "🎨" }] },
+        { name: "Achievements", icon: "↗", description: "Progress, accomplishments, and proud moments.", events: [{ date: "Add a date", title: "Something you are proud of", text: "Describe an achievement and why it mattered to you.", icon: "🏆" }] }
+      ]},
+      { year: "2023", caption: "New experiences", subjects: [
+        { name: "School & skills", icon: "▤", description: "New knowledge and important lessons.", events: [{ date: "Add a date", title: "A skill you developed", text: "Add something you learned or improved through practice.", icon: "🧠" }] },
+        { name: "Trips & experiences", icon: "⌁", description: "Places visited and experiences worth keeping.", events: [{ date: "Add a date", title: "An experience to remember", text: "Add a trip, event, celebration, or first-time experience.", icon: "🌏" }] },
+        { name: "Favourite things", icon: "♡", description: "Books, games, music, and other favourites.", events: [{ date: "Add a date", title: "A favourite from 2023", text: "List a favourite book, game, song, show, or activity and why you liked it.", icon: "🎧" }] }
+      ]},
+      { year: "2022", caption: "The beginning", subjects: [
+        { name: "Early memories", icon: "♡", description: "A few memories that started the story.", events: [{ date: "Add a date", title: "A memory from 2022", text: "Add a moment, event, or experience from this year that you want to keep.", icon: "🌱" }] },
+        { name: "Family & friends", icon: "♧", description: "Important people and shared moments.", events: [{ date: "Add a date", title: "Someone who mattered", text: "Write about a person, friendship, or family memory that stands out.", icon: "👥" }] },
+        { name: "Firsts", icon: "✧", description: "New beginnings and first-time experiences.", events: [{ date: "Add a date", title: "A first experience", text: "Record something you tried or experienced for the first time.", icon: "🚀" }] }
+      ]}
+    ];
+
+    const yearList = document.getElementById('yearList');
+    const eventList = document.getElementById('eventList');
+    const overviewGrid = document.getElementById('overviewGrid');
+    let activeYear = '2026';
+    let activeSubject = 'Goals & plans';
+
+    function renderNavigation() {
+      yearList.innerHTML = '';
+      timeline.forEach((yearData) => {
+        const group = document.createElement('div');
+        const yearButton = document.createElement('button');
+        yearButton.className = 'year-button';
+        yearButton.type = 'button';
+        yearButton.setAttribute('aria-expanded', String(yearData.year === activeYear));
+        yearButton.innerHTML = `<span class="year-left"><span class="year">${yearData.year}</span><span class="year-caption">${yearData.caption}</span></span><span class="chevron">›</span>`;
+        yearButton.addEventListener('click', () => {
+          activeYear = yearData.year;
+          activeSubject = yearData.subjects[0].name;
+          renderNavigation();
+          renderContent();
+        });
+        group.appendChild(yearButton);
+        const subjectList = document.createElement('div');
+        subjectList.className = 'subject-list' + (yearData.year === activeYear ? ' open' : '');
+        subjectList.setAttribute('aria-label', `${yearData.year} subjects`);
+        if (yearData.year === activeYear) {
+          yearData.subjects.forEach((subject) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'subject-button' + (subject.name === activeSubject ? ' active' : '');
+            button.innerHTML = `<span>${subject.icon} &nbsp; ${subject.name}</span><span class="subject-count">${subject.events.length}</span>`;
+            button.addEventListener('click', () => { activeSubject = subject.name; renderNavigation(); renderContent(); });
+            subjectList.appendChild(button);
+          });
+        }
+        group.appendChild(subjectList);
+        yearList.appendChild(group);
+      });
+    }
+
+    function renderContent() {
+      const yearData = timeline.find(item => item.year === activeYear);
+      const subject = yearData.subjects.find(item => item.name === activeSubject) || yearData.subjects[0];
+      document.getElementById('contentEyebrow').textContent = `${subject.icon}  ${subject.name}`;
+      document.getElementById('contentTitle').textContent = subject.name;
+      document.getElementById('contentDescription').textContent = subject.description;
+      document.getElementById('contentChip').textContent = activeYear;
+      eventList.innerHTML = '';
+      subject.events.forEach((event) => {
+        const card = document.createElement('article');
+        card.className = 'event-card';
+        card.innerHTML = `<div class="event-icon" aria-hidden="true">${event.icon || subject.icon}</div><div><div class="event-meta">${event.date} · ${activeYear}</div><h3>${event.title}</h3><p>${event.text}</p></div>`;
+        eventList.appendChild(card);
+      });
+      document.getElementById('photoStrip').style.display = activeYear === '2026' && activeSubject === 'Goals & plans' ? 'grid' : 'none';
+    }
+
+    function renderOverview() {
+      overviewGrid.innerHTML = '';
+      timeline.forEach(yearData => yearData.subjects.forEach(subject => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'overview-card';
+        card.innerHTML = `<div class="mini-year">${yearData.year} / ${subject.icon}</div><h3>${subject.name}</h3><p>${subject.description}</p>`;
+        card.addEventListener('click', () => {
+          activeYear = yearData.year;
+          activeSubject = subject.name;
+          renderNavigation();
+          renderContent();
+          document.querySelector('.workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        overviewGrid.appendChild(card);
+      }));
+      const subjects = timeline.reduce((sum, y) => sum + y.subjects.length, 0);
+      const events = timeline.reduce((sum, y) => sum + y.subjects.reduce((s, subject) => s + subject.events.length, 0), 0);
+      document.getElementById('yearStat').textContent = timeline.length;
+      document.getElementById('subjectStat').textContent = subjects;
+      document.getElementById('eventStat').textContent = events;
+    }
+
+    renderNavigation();
+    renderContent();
+    renderOverview();
+  </script>
+</body>
+</html>
